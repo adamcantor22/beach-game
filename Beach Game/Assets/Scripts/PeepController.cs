@@ -7,7 +7,7 @@ public class PeepController : MonoBehaviour {
 	public float moveSpeed;
 	public float rotateSpeed;
 	public float jumpForce;
-	bool canJump = true;
+	bool onGround = false;
 	Rigidbody rb;
 
 	void Start() {
@@ -15,8 +15,29 @@ public class PeepController : MonoBehaviour {
 	}
 
 	void Update() {
+		Gravity();
 		Move();
 		Rotate();
+		Jump();
+	}
+
+
+	void OnCollisionExit(Collision other) {
+		if(other.gameObject.tag == "StandableSurface") {
+			onGround = false;
+		}
+	}
+
+	void OnCollisionStay(Collision other) {
+		if(!onGround && other.gameObject.tag == "StandableSurface") {
+			onGround = true;
+		}
+	}
+
+	void Gravity() {
+		if(!onGround) {
+			rb.AddForce(Physics.gravity);
+		}
 	}
 
 	void Move() {
@@ -36,9 +57,12 @@ public class PeepController : MonoBehaviour {
 	}
 
 	void Jump() {
-		// if(Input.GetAxis("Jump") != 0 && canJump) {
-		// 	rb.AddForce()
-		// }
+		if(Input.GetAxis("Jump") != 0 && onGround) {
+			Vector3 jumpVector = new Vector3(0f, jumpForce, 0f);
+		 	rb.AddForce(jumpVector);
+			Debug.Log("jumpin");
+			onGround = false;
+		}
 	}
 
 }
